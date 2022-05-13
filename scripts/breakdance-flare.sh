@@ -1,3 +1,6 @@
+#!/bin/bash
+eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
+conda activate viser/
 dev=0
 ngpu=1
 batch_size=4

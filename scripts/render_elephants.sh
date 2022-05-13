@@ -1,3 +1,7 @@
+#!/bin/bash
+eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
+conda activate viser/
+
 model_path=$1
 
 # set of 7 vid
