@@ -128,6 +128,7 @@ def main():
             pts_trajs.append(pts_traj)
             col_trajs.append(col_traj)
     
+    # do something about num_original vert and all mesh, 
     for i in range(len(all_mesh)):
         if args.vis_bones=='yes':
             all_mesh[i].visual.vertex_colors[:,-1]=192 # alpha
