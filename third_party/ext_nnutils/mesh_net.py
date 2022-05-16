@@ -60,6 +60,69 @@ citylabs = label_colormap()
 class MeshNet(nn.Module):
     def __init__(self, input_shape, opts, nz_feat=100):
         super(MeshNet, self).__init__()
+        self.opts = opts
+        self.symmetric = opts.symmetric
+        self.symmetric_texture = opts.symmetric_texture
+
+        # Mean shape.
+        if osp.exists('tmp/sphere_%d.npy'%(opts.subdivide)):
+            sphere = np.load('tmp/sphere_%d.npy'%(opts.subdivide),allow_pickle=True)[()]
+            verts = sphere[0]
+            faces = sphere[1]
+        else:
+            verts, faces = mesh.create_sphere(opts.subdivide)
+            if not os.path.exists('tmp'): os.mkdir('tmp')
+            np.save('tmp/sphere_%d.npy'%(opts.subdivide),[verts,faces])
+        num_verts = verts.shape[0]
+        num_faces = faces.shape[0]
+
+        if self.symmetric:
+            verts, faces, num_indept, num_sym, num_indept_faces, num_sym_faces,_ = mesh.make_symmetric(verts, faces, opts.symidx)
+            num_sym_output = num_indept + num_sym
+            if opts.only_mean_sym:
+                print('Only the mean shape is symmetric!')
+                self.num_output = num_verts
+            else:
+                self.num_output = num_sym_output
+            self.num_sym = num_sym
+            self.num_indept = num_indept
+            self.num_indept_faces = num_indept_faces
+            self.num_sym_faces = num_sym_faces
+            self.mean_v = nn.Parameter(torch.Tensor(verts[:num_sym_output]).cuda())
+           
+            # texture pred
+            self.texture_type = 'vertex'
+            if self.opts.opt_tex=='yes':
+                self.tex = nn.Parameter(torch.normal(torch.zeros(num_sym_output,3).cuda(),1))
+            else:
+                self.tex = torch.normal(torch.zeros(num_sym_output,3).cuda(),1)
+        
+            # Needed for symmetrizing..
+            self.flip =Variable(torch.ones(1, 3),requires_grad=False)
+            self.flip[0, opts.symidx] = -1
+
+        else:
+            self.num_output = num_verts
+            self.mean_v = nn.Parameter(torch.Tensor(verts)[None])
+            self.texture_type = 'vertex'
+            if self.opts.opt_tex=='yes':
+                self.tex = nn.Parameter(torch.normal(torch.zeros(1,num_verts,3).cuda(),1))
+            else:
+                self.tex = torch.normal(torch.zeros(num_verts,3).cuda(),1)
+
+        config = configparser.RawConfigParser()
+        config.read('data/%s.config'%opts.dataname)
+        opts.n_hypo=1
+        self.mean_v.data = self.mean_v.data.repeat(opts.n_hypo,1,1)
+        self.tex.data = self.tex.data.repeat(opts.n_hypo,1,1)   # id, hypo, F, 3
+
+        verts_np = verts
+        faces_np = faces
+        self.faces = Variable(torch.LongTensor(faces), requires_grad=False)
+
+        self.encoder = nb.Encoder(input_shape, n_blocks=4, nz_feat=nz_feat)
+        self.code_predictor = nb.CodePredictor(nz_feat=nz_feat, num_verts=self.num_output,n_bones=opts.n_bones,n_hypo = opts.n_hypo)
+
 
     def forward(self, batch_input):
         pass
@@ -78,7 +141,7 @@ class MeshNet(nn.Module):
                 verts[:self.num_indept,self.opts.symidx]=0
                 return verts 
             else:
-                pdb.set_trace()
+                # pdb.set_trace()
                 # With batch
                 V_left = self.flip * V[:, -self.num_sym:]
                 verts = torch.cat([V, V_left], 1)

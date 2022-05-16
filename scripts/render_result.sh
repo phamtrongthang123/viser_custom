@@ -1,3 +1,7 @@
+#!/bin/bash
+eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
+conda activate viser/
+
 seqname=$1
 model_path=$2
 n_bones=$3
@@ -11,6 +15,7 @@ prefix=$testdir/$seqname
 # predict articulated meshes
 python extract.py --model_path $model_path  --checkpoint_dir $testdir\
             --dataname $seqname --n_bones 36 \
+            --notexture --only_mean_sym --nosymmetric \
             $add_args
 
 # convert to videos
