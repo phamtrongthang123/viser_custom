@@ -58,8 +58,8 @@ citylabs = label_colormap()
 #-------------- flags -------------#
 #----------------------------------#
 flags.DEFINE_boolean('noise', True, 'Add random noise to pose')
-flags.DEFINE_boolean('symmetric', True, 'Use symmetric mesh or not')
-flags.DEFINE_boolean('symmetric_loss', True, 'Use symmetric loss or not')
+flags.DEFINE_boolean('symmetric', False, 'Use symmetric mesh or not')
+flags.DEFINE_boolean('symmetric_loss', False, 'Use symmetric loss or not')
 flags.DEFINE_integer('nz_feat', 200, 'Encoded feature size')
 flags.DEFINE_boolean('debug', False, 'deubg')
 flags.DEFINE_bool('finetune', False, 'whether to load the full model and finetune it')
