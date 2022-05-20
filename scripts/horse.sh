@@ -11,17 +11,17 @@ bs=4
 
 seed=1003
 address=11112
-logname=camel-$seed
+logname=horsejump-high-$seed
 checkpoint_dir=log
 nepoch=10
 
 
-dataname=camel-init
+dataname=horsejump-high-init
 CUDA_VISIBLE_DEVICES=$dev python -m torch.distributed.launch \
     --master_port $address --nproc_per_node=$ngpu optimize.py \
     --name=$logname-0 --checkpoint_dir $checkpoint_dir --n_bones 21 \
     --num_epochs 20 --dataname $dataname --ngpu $ngpu --batch_size $bs --cnnpp --seed $seed
-dataname=camel
+dataname=horsejump-high
 CUDA_VISIBLE_DEVICES=$dev python -m torch.distributed.launch \
     --master_port $address --nproc_per_node=$ngpu optimize.py \
     --name=$logname-1 --checkpoint_dir $checkpoint_dir --n_bones 36 \

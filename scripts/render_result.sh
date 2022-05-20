@@ -14,14 +14,14 @@ prefix=$testdir/$seqname
 
 # predict articulated meshes
 python extract.py --model_path $model_path  --checkpoint_dir $testdir\
-            --dataname $seqname --n_bones 36 \
-            --notexture --only_mean_sym --nosymmetric \
+            --dataname $seqname --n_bones $n_bones \
+        #     --notexture --only_mean_sym --nosymmetric \
             $add_args
 
 # convert to videos
-ffmpeg -r 7 -i $testdir/render-%*.png -c:v libx264 -vf fps=$fr -pix_fmt  \
+ffmpeg -y -r 7 -i $testdir/render-%*.png -c:v libx264 -vf fps=$fr -pix_fmt  \
         yuv420p $testdir/$seqname-$epoch.mp4
-ffmpeg \
+ffmpeg -y \
   -i $testdir/$seqname-$epoch.mp4 \
      $testdir/$seqname-$epoch.gif
 sleep 1
@@ -54,7 +54,7 @@ sleep 1
 python render_vis.py --testdir $testdir --outpath $prefix-tra$suffix --seqname $seqname --freeze no --overlay no --fixlight no --vis_bone no --append_img no --append_render yes --vis_traj yes
 sleep 1
 
-ffmpeg -y  -i $prefix-vid$suffix \
+ffmpeg -y -y  -i $prefix-vid$suffix \
            -i $prefix-tex$suffix \
            -i $prefix-cor$suffix \
            -i $prefix-bne$suffix \
@@ -68,4 +68,4 @@ ffmpeg -y  -i $prefix-vid$suffix \
 -map "[v]" \
 $prefix-all$suffix
 
-ffmpeg -y -i $prefix-all.mp4 -vf "scale=iw/2:ih/2" $prefix-all.gif
+ffmpeg -y -y -i $prefix-all.mp4 -vf "scale=iw/2:ih/2" $prefix-all.gif
