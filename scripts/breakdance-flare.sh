@@ -1,11 +1,11 @@
 #!/bin/bash
 eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
 conda activate viser/
-dev=0
+dev=2
 ngpu=1
 batch_size=4
 
-#dev=0,1,2,3
+#dev=2,1,2,3
 #ngpu=4
 #batch_size=1
 

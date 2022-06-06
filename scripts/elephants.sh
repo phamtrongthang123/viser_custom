@@ -2,7 +2,7 @@
 eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
 conda activate viser/
 
-dev=0
+dev=2
 ngpu=1
 bs=4
 
