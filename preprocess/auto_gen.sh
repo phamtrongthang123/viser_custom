@@ -10,7 +10,7 @@ array=(2 4 8)
 testres=1
 
 # run flow estimation
-CUDA_VISIBLE_DEVICES=0 python preprocess/auto_gen.py --datapath $davisdir/JPEGImages/$res/$seqname/ \
+python preprocess/auto_gen.py --datapath $davisdir/JPEGImages/$res/$seqname/ \
     --loadmodel ./lasr_vcn/vcn_rob.pth  \
     --testres $testres --flow_threshold 0
 
